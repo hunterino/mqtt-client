@@ -2,25 +2,27 @@
 <polymer-element name="mqtt-client-pub" attributes="ref topic message">
     <template>
         <mqtt-client id="{{ref}}"></mqtt-client>
-        </template>
-    <script src="bower_components/org.eclipse.paho.mqtt.javascript/src/mqttws31.js"></script>
+    </template>
+    <script src="mqttws31.js"></script>
     <script>
     Polymer({
 
-        // init public properties
+        // Public Properties
         ref: "",
         topic: "",
         message: "",
 
-        // init private properties
-        _client: function() {
-            return this.$[this.ref]._exp;
-        },
-
+        // Public Methods
         go: function() {
+            var ref = this.$[this.ref];
+            if (typeof ref === 'undefined')
+                return;
+            var exp = ref._exp;
+            if (typeof exp === 'undefined' || !exp.isConnected())
+                return;
             var message = new Paho.MQTT.Message(this.message);
             message.destinationName = this.topic;
-            this._client().mqtt.send(message);
+            exp.mqtt.send(message);
         }
 
     });

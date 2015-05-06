@@ -1,7 +1,7 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
-<polymer-element name="mqtt-client" attributes="host port username password clientName timeout autoConnect autoRetry connected">
+<polymer-element name="mqtt-client" attributes="host port userName password clientName timeout autoConnect autoRetry connected ssl">
     <template> </template>
-    <script src="bower_components/org.eclipse.paho.mqtt.javascript/src/mqttws31.js"></script>
+    <script src="mqttws31.js"></script>
     <script>
     (function() {
 
@@ -9,7 +9,7 @@
         var values = {
             host: '',
             client: '',
-            username: '',
+            userName: '',
             password: '',
             port: 0,
             mqtt: null,
@@ -20,60 +20,81 @@
                 } else {
                     return false;
                 }
+            },
+            addCallback: function(topic, qos, callback) {
+                values.callbacks.push({
+                    topic: topic.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"),
+                    originalTopic: topic,
+                    qos: qos,
+                    function: callback
+                });
             }
         };
 
         Polymer({
 
-            // *** PARAMETERS ***
-
+            // Public Properties
             clientName: (function() {
                 return Math.floor((1 + Math.random()) * 0x100000000).toString(16).substring(1);
             })(),
-            username: "",
+            userName: "",
             password: "",
-            timeout: "3",
-            autoConnect: "true",
-            autoRetry: "true",
-            connected: false,
+            timeout: 3,
+            ssl: false,
+            autoConnect: true,
+            autoRetry: true,
+            connected: values.isConnected(),
 
-            // *** METHODS : PRIVATE ***
-
-            _escapeRegExp: function(str) {
-                return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-            },
-            _parseBool: function(val) {
-                return String(val).toLowerCase() === "true";
-            },
-
-            // *** METHODS : PUBLIC ***
-
+            // Public Methods
             connect: function() {
-                if (!values.isConnected()) {
-                    values.mqtt.connect({
-                        timeout: parseInt(this.timeout),
-                        useSSL: false,
-                        userName: "",
-                        password: "",
-                        mqttVersion: 3,
-                        onSuccess: function() {
-                            this.connected = true;
-                        }.bind(this),
-                        onFailure: function(message) {
-                            if (this._parseBool(this.autoConnect)) {
+                if (values.isConnected())
+                    return;
+                values.mqtt.connect({
+                    timeout: this.timeout,
+                    useSSL: this.ssl,
+                    userName: this.userName,
+                    password: this.password,
+                    mqttVersion: 3,
+                    onSuccess: function() {
+                        values.mqtt.onConnectionLost = function(responseObject) {
+                            this.connected = false;
+                            if (this.autoConnect) {
                                 setTimeout(function() {
                                     this.connect();
-                                }.bind(this), parseInt(this.timeout) * 1000);
+                                }.bind(this), this.timeout * 1000);
                             }
-                        }.bind(this)
-                    });
-                } else {
-                    this.connected = true;
-                }
+                        }.bind(this);
+                        values.mqtt.onMessageArrived = function(message) {
+                            for (var i = 0; i < values.callbacks.length; i++) {
+                                if (message.destinationName.match(values.callbacks[i].topic.replace("#", ".+").replace("\\+", "[^/]+")) !== null) {
+                                    values.callbacks[i].function(message.destinationName, message.payloadString);
+                                }
+                            }
+                        };
+                        // Subscribe everything in callbacks:
+                        for (var i = 0; i < values.callbacks.length; i++) {
+                            values.mqtt.subscribe(values.callbacks[i].originalTopic, {
+                                qos: values.callbacks[i].qos
+                            });
+                        }
+                        this.connected = true;
+                    }.bind(this),
+                    onFailure: function(message) {
+                        if (this.autoConnect) {
+                            setTimeout(function() {
+                                this.connect();
+                            }.bind(this), this.timeout * 1000);
+                        }
+                    }.bind(this)
+                });
+            },
+            disconnect: function() {
+                if (!values.isConnected())
+                    return;
+                values.mqtt.disconnect();
             },
 
-            // *** EVENTS ***
-
+            // Events
             ready: function() {
                 if (values.mqtt === null && this.host !== "" && this.port !== "") {
                     values.host = this.host;
@@ -84,30 +105,9 @@
                     values.mqtt = new Paho.MQTT.Client(values.host,
                         parseInt(values.port),
                         values.client);
-                    if (this._parseBool(this.autoConnect)) {
+                    if (this.autoConnect) {
                         this.connect();
                     }
-                    values.addCallback = function(topic, callback) {
-                        values.callbacks.push({
-                            topic: this._escapeRegExp(topic),
-                            function: callback
-                        });
-                    }.bind(this);
-                    values.mqtt.onMessageArrived = function(message) {
-                        for (var i = 0; i < values.callbacks.length; i++) {
-                            if (message.destinationName.match(values.callbacks[i].topic.replace("#", ".+").replace("\\+", "[^/]+")) !== null) {
-                                values.callbacks[i].function(message.destinationName, message.payloadString);
-                            }
-                        }
-                    };
-                    values.mqtt.onConnectionLost = function(responseObject) {
-                        this.connected = false;
-                        if (this._parseBool(this.autoConnect)) {
-                            setTimeout(function() {
-                                this.connect();
-                            }.bind(this), parseInt(this.timeout) * 1000);
-                        }
-                    }.bind(this);
                 }
                 this._exp = values;
             }

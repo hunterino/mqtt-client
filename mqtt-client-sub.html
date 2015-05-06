@@ -1,36 +1,45 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
-<polymer-element name="mqtt-client-sub" attributes="ref topic message qos prog autoRetry">
+<polymer-element name="mqtt-client-sub" attributes="ref topic message qos count autoRetry">
     <template>
         <mqtt-client id="{{ref}}"></mqtt-client>
     </template>
     <script>
     Polymer({
-        qos: "0",
-        prog: 0,
-        autoRetry: "true",
+
+        // Public Properties
+        qos: 0,
+        count: 0,
+        autoRetry: true,
+        topic: "",
+        message: "",
+
+        // Events
         ready: function() {
-            this.client = this.$[this.ref]._exp;
+            var ref = this.$[this.ref];
+            if (typeof ref === 'undefined')
+                return;
+            this._client = ref._exp;
             this.subscribe();
         },
-        _parseBool: function(val) {
-            return String(val).toLowerCase() === "true";
-        },
+
+        // Public Methods
         subscribe: function() {
-            if (typeof this.client !== 'undefined' && this.client.isConnected()) {
-                this.client.mqtt.subscribe(this.topic, {
-                    qos: parseInt(this.qos)
+            if (typeof this._client !== 'undefined' && this._client.isConnected()) {
+                this._client.mqtt.subscribe(this.topic, {
+                    qos: this.qos
                 });
-                this.client.addCallback(this.topic, function(topic, data) {
+                this._client.addCallback(this.topic, this.qos, function(topic, data) {
                     this.topic = topic;
                     this.message = data;
-                    this.prog ++;
+                    this.count++;
                 }.bind(this));
-            } else if (this._parseBool(this.autoRetry)) {
+            } else if (this.autoRetry) {
                 setTimeout(function() {
                     this.subscribe();
                 }.bind(this), 100);
             }
         }
+
     });
     </script>
 </polymer-element>
