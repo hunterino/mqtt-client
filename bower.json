@@ -1,0 +1,34 @@
+{
+    "name": "mqtt-client",
+    "version": "0.1.0",
+    "authors": [
+        "Ivan Centamori <centamori@gmail.com>"
+    ],
+    "description": "An element that implement a client for the MQTT protocol. It is capable of Publish messages and Subscribe multiple topics.",
+    "keywords": [
+        "web-component",
+        "web-components",
+        "polymer",
+        "mqtt",
+        "publish",
+        "pub",
+        "subscribe",
+        "sub",
+        "iot",
+        "telemetry"
+    ],
+    "main": "mqtt-client.html",
+    "license": "MIT",
+    "homepage": "https://github.com/centamiv/mqtt-client/",
+    "ignore": [
+        ".*",
+        "demo",
+        "bower_components"
+    ],
+    "dependencies": {
+        "polymer": "Polymer/polymer#^0.5"
+    },
+    "devDependencies": {
+        "org.eclipse.paho.mqtt.javascript": "http://git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.javascript.git#~1.0.1"
+    }
+}

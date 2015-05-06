@@ -1,0 +1,119 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<polymer-element name="mqtt-client" attributes="host port username password clientName timeout autoConnect autoRetry connected">
+    <template> </template>
+    <script src="bower_components/org.eclipse.paho.mqtt.javascript/src/mqttws31.js"></script>
+    <script>
+    (function() {
+
+        // *** SHARED VARIABLES ***
+        var values = {
+            host: '',
+            client: '',
+            username: '',
+            password: '',
+            port: 0,
+            mqtt: null,
+            callbacks: [],
+            isConnected: function() {
+                if (values.mqtt !== null) {
+                    return values.mqtt.isConnected();
+                } else {
+                    return false;
+                }
+            }
+        };
+
+        Polymer({
+
+            // *** PARAMETERS ***
+
+            clientName: (function() {
+                return Math.floor((1 + Math.random()) * 0x100000000).toString(16).substring(1);
+            })(),
+            username: "",
+            password: "",
+            timeout: "3",
+            autoConnect: "true",
+            autoRetry: "true",
+            connected: false,
+
+            // *** METHODS : PRIVATE ***
+
+            _escapeRegExp: function(str) {
+                return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+            },
+            _parseBool: function(val) {
+                return String(val).toLowerCase() === "true";
+            },
+
+            // *** METHODS : PUBLIC ***
+
+            connect: function() {
+                if (!values.isConnected()) {
+                    values.mqtt.connect({
+                        timeout: parseInt(this.timeout),
+                        useSSL: false,
+                        userName: "",
+                        password: "",
+                        mqttVersion: 3,
+                        onSuccess: function() {
+                            this.connected = true;
+                        }.bind(this),
+                        onFailure: function(message) {
+                            if (this._parseBool(this.autoConnect)) {
+                                setTimeout(function() {
+                                    this.connect();
+                                }.bind(this), parseInt(this.timeout) * 1000);
+                            }
+                        }.bind(this)
+                    });
+                } else {
+                    this.connected = true;
+                }
+            },
+
+            // *** EVENTS ***
+
+            ready: function() {
+                if (values.mqtt === null && this.host !== "" && this.port !== "") {
+                    values.host = this.host;
+                    values.port = this.port;
+                    values.client = this.clientName;
+                    values.username = this.username;
+                    values.password = this.password;
+                    values.mqtt = new Paho.MQTT.Client(values.host,
+                        parseInt(values.port),
+                        values.client);
+                    if (this._parseBool(this.autoConnect)) {
+                        this.connect();
+                    }
+                    values.addCallback = function(topic, callback) {
+                        values.callbacks.push({
+                            topic: this._escapeRegExp(topic),
+                            function: callback
+                        });
+                    }.bind(this);
+                    values.mqtt.onMessageArrived = function(message) {
+                        for (var i = 0; i < values.callbacks.length; i++) {
+                            if (message.destinationName.match(values.callbacks[i].topic.replace("#", ".+").replace("\\+", "[^/]+")) !== null) {
+                                values.callbacks[i].function(message.destinationName, message.payloadString);
+                            }
+                        }
+                    };
+                    values.mqtt.onConnectionLost = function(responseObject) {
+                        this.connected = false;
+                        if (this._parseBool(this.autoConnect)) {
+                            setTimeout(function() {
+                                this.connect();
+                            }.bind(this), parseInt(this.timeout) * 1000);
+                        }
+                    }.bind(this);
+                }
+                this._exp = values;
+            }
+
+        });
+
+    })();
+    </script>
+</polymer-element>

@@ -1,0 +1,36 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<polymer-element name="mqtt-client-sub" attributes="ref topic message qos prog autoRetry">
+    <template>
+        <mqtt-client id="{{ref}}"></mqtt-client>
+    </template>
+    <script>
+    Polymer({
+        qos: "0",
+        prog: 0,
+        autoRetry: "true",
+        ready: function() {
+            this.client = this.$[this.ref]._exp;
+            this.subscribe();
+        },
+        _parseBool: function(val) {
+            return String(val).toLowerCase() === "true";
+        },
+        subscribe: function() {
+            if (typeof this.client !== 'undefined' && this.client.isConnected()) {
+                this.client.mqtt.subscribe(this.topic, {
+                    qos: parseInt(this.qos)
+                });
+                this.client.addCallback(this.topic, function(topic, data) {
+                    this.topic = topic;
+                    this.message = data;
+                    this.prog ++;
+                }.bind(this));
+            } else if (this._parseBool(this.autoRetry)) {
+                setTimeout(function() {
+                    this.subscribe();
+                }.bind(this), 100);
+            }
+        }
+    });
+    </script>
+</polymer-element>

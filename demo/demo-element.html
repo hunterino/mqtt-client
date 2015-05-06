@@ -1,0 +1,33 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../mqtt-client.html">
+<link rel="import" href="../mqtt-client-sub.html">
+<link rel="import" href="../mqtt-client-pub.html">
+<polymer-element name="demo-element" attributes="ref topic message qos">
+    <template>
+        <mqtt-client id="a" host="broker.mqtt-dashboard.com" port="8000" username="" password="" clientName="{{client}}" connected="{{connected}}"></mqtt-client>
+        <mqtt-client-sub ref="a" topic="{{topic}}" message="{{message}}" qos="2" prog="{{prog}}"></mqtt-client-sub>
+        <mqtt-client-pub ref="a" topic="{{send_topic}}" message="{{send_message}}" id="pub1"></mqtt-client-pub>
+        <p>{{connected}}</p>
+        <h1>receive</h1>
+        <p>{{client}} - {{prog}}</p>
+        <p>{{topic}}</p>
+        <p>{{message}}</p>
+        <h1>send</h1>
+        <label> topic
+            <input value="{{send_topic}}">
+        </label>
+        <label> message
+            <input value="{{send_message}}">
+        </label>
+        <button on-click="{{sendMessage}}">Invia</button>
+    </template>
+    <script>
+    Polymer({
+        topic: "#",
+        send_topic: "/demo",
+        sendMessage: function() {
+            this.$.pub1.go();
+        }
+    });
+    </script>
+</polymer-element>
