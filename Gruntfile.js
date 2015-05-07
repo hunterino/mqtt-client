@@ -18,12 +18,25 @@ module.exports = function (grunt) {
                     {src: 'src/mqttws31.js', dest: 'mqttws31.js'}
                 ]
             }
+        },
+        vulcanize: {
+            dist: {
+                options: {
+                    csp: false,
+                    inline: true,
+                    strip: true
+                },
+                files: {
+                    'demo/demo.html': 'src/demo/index.html'
+                }
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-processhtml');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-vulcanize');
 
-    grunt.registerTask('dist', ['processhtml', 'copy']);
+    grunt.registerTask('dist', ['processhtml', 'copy', 'vulcanize']);
 
 };
