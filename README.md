@@ -1,4 +1,12 @@
-# mqtt-client
+# Installation
+
+Using **bower**:
+
+```
+bower install --save mqtt-client
+```
+
+# MQTT-CLIENT
 
 *mqtt-client* is a static element that performs the connection to a MQTT broker listening on a WebSocket TCP port.
 
@@ -71,7 +79,7 @@ If you want to control the connection you should disable the *autoConnect* prope
 **connect()** | Open the connection to the broker 
 **disconnect()** | Disconnect from the broker
 
-# mqtt-client-sub
+# MQTT-CLIENT-SUB
 
 *mqtt-client-sub* is an element which lets you subscribe to a topic.
 
@@ -132,7 +140,7 @@ Of course you can subscribe multiple topics:
 **qos** | number | Quality of service | 0
 **autoRetry** | boolean | Automatically retry the subscription if the connection was down when the element was instantiated | true
 
-# mqtt-client-pub
+# MQTT-CLIENT-PUB
 
 Publish messages on a topic.
 
