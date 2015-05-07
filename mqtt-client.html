@@ -44,6 +44,8 @@
             autoConnect: true,
             autoRetry: true,
             connected: values.isConnected(),
+            host: "",
+            port: 0,
 
             // Public Methods
             connect: function() {
@@ -96,7 +98,7 @@
 
             // Events
             ready: function() {
-                if (values.mqtt === null && this.host !== "" && this.port !== "") {
+                if (values.mqtt === null && this.host !== "" && this.port !== 0) {
                     values.host = this.host;
                     values.port = this.port;
                     values.client = this.clientName;
