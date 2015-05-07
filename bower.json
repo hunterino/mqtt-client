@@ -4,7 +4,7 @@
     "authors": [
         "Ivan Centamori <centamori@gmail.com>"
     ],
-    "description": "An element that implement a client for the MQTT protocol. It is capable of Publish messages and Subscribe multiple topics.",
+    "description": "Web element that implement a client for the MQTT protocol. It is capable of Publish messages and Subscribe multiple topics.",
     "keywords": [
         "web-component",
         "web-components",

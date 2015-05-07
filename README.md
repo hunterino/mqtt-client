@@ -231,7 +231,7 @@ This example shows an ipotetic separation scenario. On every custom element you 
 </polymer-element>
 ```
 
-# Multiple connection
+# Multiple connections
 
 Of course you can manage multiple brokers at the same time inside your elements:
 

@@ -1,0 +1,20 @@
+{
+  "name": "mqtt-client",
+  "version": "0.1.0",
+  "description": "Web element that implement a client for the MQTT protocol. It is capable of Publish messages and Subscribe multiple topics.",
+  "main": "mqtt-client.html",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/centamiv/mqtt-client.git"
+  },
+  "author": "Ivan Centamori <centamori@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/centamiv/mqtt-client/issues"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-copy": "^0.8.0",
+    "grunt-processhtml": "^0.3.7"
+  }
+}

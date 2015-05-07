@@ -1,4 +1,4 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../mqtt-client.html">
 <link rel="import" href="../mqtt-client-sub.html">
 <link rel="import" href="../mqtt-client-pub.html">
@@ -31,21 +31,21 @@
         </fieldset>
     </template>
     <script>
-    Polymer({
-        host: "broker.mqtt-dashboard.com",
-        port: 8000,
-        topic: "#",
-        send_topic: "demo/mqtt-client",
-        sendMessage: function() {
-            this.$.pub1.go();
-        },
-        connectEvent: function() {
-            if (this.connected) {
-                this.$.a.disconnect();
-            } else {
-                this.$.a.connect();
+        Polymer({
+            host: "broker.mqtt-dashboard.com",
+            port: 8000,
+            topic: "#",
+            send_topic: "demo/mqtt-client",
+            sendMessage: function () {
+                this.$.pub1.go();
+            },
+            connectEvent: function () {
+                if (this.connected) {
+                    this.$.a.disconnect();
+                } else {
+                    this.$.a.connect();
+                }
             }
-        }
-    });
+        });
     </script>
 </polymer-element>

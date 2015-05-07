@@ -1,45 +1,46 @@
 <link rel="import" href="../polymer/polymer.html">
+
 <polymer-element name="mqtt-client-sub" attributes="ref topic message qos count autoRetry">
     <template>
         <mqtt-client id="{{ref}}"></mqtt-client>
     </template>
     <script>
-    Polymer({
+        Polymer({
 
-        // Public Properties
-        qos: 0,
-        count: 0,
-        autoRetry: true,
-        topic: "",
-        message: "",
+            // Public Properties
+            qos: 0,
+            count: 0,
+            autoRetry: true,
+            topic: "",
+            message: "",
 
-        // Events
-        ready: function() {
-            var ref = this.$[this.ref];
-            if (typeof ref === 'undefined')
-                return;
-            this._client = ref._exp;
-            this.subscribe();
-        },
+            // Events
+            ready: function () {
+                var ref = this.$[this.ref];
+                if (typeof ref === 'undefined')
+                    return;
+                this._client = ref._exp;
+                this.subscribe();
+            },
 
-        // Public Methods
-        subscribe: function() {
-            if (typeof this._client !== 'undefined' && this._client.isConnected()) {
-                this._client.mqtt.subscribe(this.topic, {
-                    qos: this.qos
-                });
-                this._client.addCallback(this.topic, this.qos, function(topic, data) {
-                    this.topic = topic;
-                    this.message = data;
-                    this.count++;
-                }.bind(this));
-            } else if (this.autoRetry) {
-                setTimeout(function() {
-                    this.subscribe();
-                }.bind(this), 100);
+            // Public Methods
+            subscribe: function () {
+                if (typeof this._client !== 'undefined' && this._client.isConnected()) {
+                    this._client.mqtt.subscribe(this.topic, {
+                        qos: this.qos
+                    });
+                    this._client.addCallback(this.topic, this.qos, function (topic, data) {
+                        this.topic = topic;
+                        this.message = data;
+                        this.count++;
+                    }.bind(this));
+                } else if (this.autoRetry) {
+                    setTimeout(function () {
+                        this.subscribe();
+                    }.bind(this), 100);
+                }
             }
-        }
 
-    });
+        });
     </script>
 </polymer-element>
