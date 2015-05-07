@@ -126,7 +126,7 @@ Of course you can subscribe multiple topics:
 **Attribute** | Type | Description | Default
 --- | --- | --- | ---
 **ref** | string | **(required)** The id of the *mqtt-client* component which manage the connection | *undefined*
-**topic** | string | **(required)** Topic to subscribe. Standard wildcards (# and +) are supported | ""
+**topic** | string | **(required)** Topic to subscribe. Standard wildcards (# and +) are supported. After the subscription, this attribute will contain the topic reltive to the *message* received | ""
 **message** | string | **(read only)** The message payload received from the broker | ""
 **count** | number | **(read only)** Progressive number, increased every time a message is received. Useful when the payload (and so the *message* attribute) don't change among contiguous messages | 0
 **qos** | number | Quality of service | 0

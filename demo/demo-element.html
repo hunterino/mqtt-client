@@ -5,38 +5,30 @@
 <polymer-element name="demo-element" attributes="ref topic message qos">
     <template>
         <mqtt-client id="a" host="{{host}}" port="{{port}}" connected="{{connected}}" autoConnect="false"></mqtt-client>
-        <mqtt-client-sub ref="a" topic="{{topic}}" message="{{message}}" qos="2" prog="{{prog}}"></mqtt-client-sub>
-        <mqtt-client-sub ref="a" topic="+/#" message="{{message2}}"></mqtt-client-sub>
-        <mqtt-client-sub ref="a" topic="demo/mqtt-client" message="{{message3}}"></mqtt-client-sub>
+        <mqtt-client-sub ref="a" topic="{{topic}}" message="{{message}}" count="{{message_count}}"></mqtt-client-sub>
         <mqtt-client-pub ref="a" topic="{{send_topic}}" message="{{send_message}}" id="pub1"></mqtt-client-pub>
         <fieldset>
             <legend>MQTT Broker (Websocket)</legend>
-            Host
+            Host: <input type="text" value="{{host}}">
             <br>
-            <input type="text" value="{{host}}">
-            <br> Port
-            <br>
-            <input type="text" value="{{port}}">
-            <br>
+            Port: <input type="text" value="{{port}}">
             <br>
             <button type="submit" on-tap="{{connectEvent}}">{{connected ? "Disconnect":"Connect"}}</button>
         </fieldset>
-        <h1>receive</h1>
-        <p>{{client}} - {{prog}}</p>
-        <p>{{topic}}</p>
-        <p>{{message}}</p>
-        <h1>receive2 +/#</h1>
-        <p>{{message2}}</p>
-        <h1>receive3 demo/mqtt-client</h1>
-        <p>{{message3}}</p>
-        <h1>send</h1>
-        <label> topic
-            <input value="{{send_topic}}">
-        </label>
-        <label> message
-            <input value="{{send_message}}">
-        </label>
-        <button on-click="{{sendMessage}}">Invia</button>
+        <fieldset style="display:{{connected ? 'block':'none'}}">
+            <legend>Send</legend>
+            Topic: <input value="{{send_topic}}">
+            <br>
+            Message: <input value="{{send_message}}">
+            <br>
+            <button on-click="{{sendMessage}}">Send</button>
+        </fieldset>
+        <fieldset>
+            <legend>Receive</legend>
+            Message count: {{message_count}}
+            <br> Topic: {{topic}}
+            <br> Message: {{message}}
+        </fieldset>
     </template>
     <script>
     Polymer({
@@ -53,9 +45,6 @@
             } else {
                 this.$.a.connect();
             }
-        },
-        disconnectEvent: function() {
-            this.$.a.disconnect();
         }
     });
     </script>
