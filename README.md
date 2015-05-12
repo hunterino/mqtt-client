@@ -97,7 +97,7 @@ The following code will connect to the broker and subscribes all the topics:
 	<mqtt-client-sub ref="myclient"
 	                 topic="#"
 	                 message="{{message}}"
-	                 prog="{{messageCount}}"></mqtt-client-sub>
+	                 count="{{messageCount}}"></mqtt-client-sub>
 	<p>
 		Connected: {{conn}}<br>
 		Message received: {{message}}<br>
