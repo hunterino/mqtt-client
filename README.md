@@ -96,11 +96,12 @@ The following code will connect to the broker and subscribes all the topics:
 	</mqtt-client>
 	<mqtt-client-sub ref="myclient"
 	                 topic="#"
+	                 fromTopic="{{topic}}"
 	                 message="{{message}}"
 	                 count="{{messageCount}}"></mqtt-client-sub>
 	<p>
 		Connected: {{conn}}<br>
-		Message received: {{message}}<br>
+		Message received: {{topic}} {{message}}<br>
 		Message count: {{messageCount}}
 	</p>
 </template>
@@ -134,8 +135,9 @@ Of course you can subscribe multiple topics:
 **Attribute** | Type | Description | Default
 --- | --- | --- | ---
 **ref** | string | **(required)** The id of the *mqtt-client* component which manage the connection | *undefined*
-**topic** | string | **(required)** Topic to subscribe. Standard wildcards (# and +) are supported. After the subscription, this attribute will contain the topic reltive to the *message* received | ""
+**topic** | string | **(required)** Topic to subscribe. Standard wildcards (# and +) are supported. When the value changes, the subscription will be invalidated and a new subscription will be made | ""
 **message** | string | **(read only)** The message payload received from the broker | ""
+**fromTopic** | string | This attribute will contain the topic reltive to the *message* received | ""
 **count** | number | **(read only)** Progressive number, increased every time a message is received. Useful when the payload (and so the *message* attribute) don't change among contiguous messages | 0
 **qos** | number | Quality of service | 0
 **autoRetry** | boolean | Automatically retry the subscription if the connection was down when the element was instantiated | true

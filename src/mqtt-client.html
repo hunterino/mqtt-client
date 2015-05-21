@@ -31,6 +31,18 @@
                         qos: qos,
                         function: callback
                     });
+                },
+                delCallback: function (topic) {
+                    var topic_ex = topic.replace(/[\-\[\]\/\{}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+                    var index = -1;
+                    for (var i = 0; i < values.callbacks.length; i++) {
+                        if (values.callbacks[i].topic === topic_ex) {
+                            index = i;
+                        }
+                    }
+                    if (index > -1) {
+                        values.callbacks.splice(index, 1);
+                    }
                 }
             };
 
@@ -61,6 +73,7 @@
                         password: this.password,
                         mqttVersion: 3,
                         onSuccess: function () {
+                            console.log("mqtt connected");
                             values.mqtt.onConnectionLost = function (responseObject) {
                                 this.connected = false;
                                 if (this.autoConnect) {
@@ -78,6 +91,7 @@
                             };
                             // Subscribe everything in callbacks:
                             for (var i = 0; i < values.callbacks.length; i++) {
+                                console.log("subscribing topic: " + values.callbacks[i].originalTopic);
                                 values.mqtt.subscribe(values.callbacks[i].originalTopic, {
                                     qos: values.callbacks[i].qos
                                 });
@@ -85,6 +99,7 @@
                             this.connected = true;
                         }.bind(this),
                         onFailure: function (message) {
+                            console.log(message);
                             if (this.autoConnect) {
                                 setTimeout(function () {
                                     this.connect();

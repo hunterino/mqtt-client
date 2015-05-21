@@ -1,6 +1,6 @@
 {
   "name": "mqtt-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Web element that implement a client for the MQTT protocol. It is capable of Publish messages and Subscribe multiple topics.",
   "main": "mqtt-client.html",
   "repository": {

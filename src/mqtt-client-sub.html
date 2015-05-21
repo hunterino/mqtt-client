@@ -2,7 +2,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <!-- /build -->
 
-<polymer-element name="mqtt-client-sub" attributes="ref topic message qos count autoRetry">
+<polymer-element name="mqtt-client-sub" attributes="ref topic fromTopic message qos count autoRetry">
     <template>
         <mqtt-client id="{{ref}}"></mqtt-client>
     </template>
@@ -15,6 +15,7 @@
             autoRetry: true,
             topic: "",
             message: "",
+            fromTopic: "",
 
             // Events
             ready: function () {
@@ -25,14 +26,22 @@
                 this.subscribe();
             },
 
+            topicChanged: function(prev, next) {
+                if (typeof this._client !== 'undefined' && this._client.isConnected() && prev !== "") {
+                    this._client.mqtt.unsubscribe(prev);
+                    this._client.delCallback(prev);
+                    this.subscribe();
+                }
+            },
+
             // Public Methods
             subscribe: function () {
-                if (typeof this._client !== 'undefined' && this._client.isConnected()) {
+                if (typeof this._client !== 'undefined' && this._client.isConnected() && this.topic !== "") {
                     this._client.mqtt.subscribe(this.topic, {
                         qos: this.qos
                     });
                     this._client.addCallback(this.topic, this.qos, function (topic, data) {
-                        this.topic = topic;
+                        this.fromTopic = topic;
                         this.message = data;
                         this.count++;
                     }.bind(this));

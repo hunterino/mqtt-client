@@ -7,7 +7,8 @@
 <polymer-element name="demo-element" attributes="ref topic message qos">
     <template>
         <mqtt-client id="a" host="{{host}}" port="{{port}}" connected="{{connected}}" autoConnect="false"></mqtt-client>
-        <mqtt-client-sub ref="a" topic="{{topic}}" message="{{message}}" count="{{message_count}}"></mqtt-client-sub>
+        <mqtt-client-sub ref="a" topic="{{receive_topic}}" fromTopic="{{topic}}" message="{{receive_message}}"
+                         count="{{receive_message_count}}"></mqtt-client-sub>
         <mqtt-client-pub ref="a" topic="{{send_topic}}" message="{{send_message}}" id="pub1"></mqtt-client-pub>
         <fieldset>
             <legend>MQTT Broker (Websocket)</legend>
@@ -27,9 +28,9 @@
         </fieldset>
         <fieldset>
             <legend>Receive</legend>
-            Message count: {{message_count}}
-            <br> Topic: {{topic}}
-            <br> Message: {{message}}
+            Message count: {{receive_message_count}}
+            <br> Topic: {{receive_topic}}
+            <br> Message: {{receive_message}}
         </fieldset>
     </template>
     <script>
