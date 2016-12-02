@@ -2,51 +2,75 @@
 <link rel="import" href="../mqtt-client.html">
 <link rel="import" href="../mqtt-client-sub.html">
 <link rel="import" href="../mqtt-client-pub.html">
-<polymer-element name="demo-element" attributes="ref topic message qos">
-    <template>
-        <mqtt-client id="a" host="{{host}}" port="{{port}}" connected="{{connected}}" autoConnect="false"></mqtt-client>
-        <mqtt-client-sub ref="a" topic="{{receive_topic}}" fromTopic="{{topic}}" message="{{receive_message}}"
-                         count="{{receive_message_count}}"></mqtt-client-sub>
+<dom-module id="demo-element">
+  <template>
+        <mqtt-client id="a" host="{{host}}" port="{{port}}" connected="{{connected}}" autoconnect="false"></mqtt-client>
+        <mqtt-client-sub ref="a" topic="{{receive_topic}}" fromtopic="{{topic}}" message="{{receive_message}}" count="{{receive_message_count}}"></mqtt-client-sub>
         <mqtt-client-pub ref="a" topic="{{send_topic}}" message="{{send_message}}" id="pub1"></mqtt-client-pub>
         <fieldset>
             <legend>MQTT Broker (Websocket)</legend>
-            Host: <input type="text" value="{{host}}">
+            Host: <input type="text" value="{{host::input}}">
             <br>
-            Port: <input type="text" value="{{port}}">
+            Port: <input type="text" value="{{port::input}}">
             <br>
-            <button type="submit" on-tap="{{connectEvent}}">{{connected ? "Disconnect":"Connect"}}</button>
+            <button type="submit" on-tap="connectEvent">{{_computeExpression1(connected)}}</button>
         </fieldset>
-        <fieldset style="display:{{connected ? 'block':'none'}}">
+        <fieldset style$="{{_computeStyle(connected)}}">
             <legend>Send</legend>
-            Topic: <input value="{{send_topic}}">
+            Topic: <input value="{{send_topic::input}}">
             <br>
-            Message: <input value="{{send_message}}">
+            Message: <input value="{{send_message::input}}">
             <br>
-            <button on-click="{{sendMessage}}">Send</button>
+            <button on-click="sendMessage">Send</button>
         </fieldset>
         <fieldset>
             <legend>Receive</legend>
-            Message count: {{receive_message_count}}
-            <br> Topic: {{receive_topic}}
-            <br> Message: {{receive_message}}
+            Message count: <span>{{receive_message_count}}</span>
+            <br> Topic: <span>{{receive_topic}}</span>
+            <br> Message: <span>{{receive_message}}</span>
         </fieldset>
     </template>
-    <script>
-        Polymer({
-            host: "broker.mqtt-dashboard.com",
-            port: 8000,
-            topic: "#",
-            send_topic: "demo/mqtt-client",
-            sendMessage: function () {
-                this.$.pub1.go();
-            },
-            connectEvent: function () {
-                if (this.connected) {
-                    this.$.a.disconnect();
-                } else {
-                    this.$.a.connect();
-                }
-            }
-        });
-    </script>
-</polymer-element>
+  <script>
+    Polymer({
+      is: 'demo-element',
+      properties: {
+        host: {
+          type: String,
+          value: 'broker.mqtt-dashboard.com'
+        },
+        message: { notify: true },
+        port: {
+          type: Number,
+          value: 8000
+        },
+        qos: { notify: true },
+        ref: { notify: true },
+        send_topic: {
+          type: String,
+          value: 'demo/mqtt-client'
+        },
+        topic: {
+          type: String,
+          value: '#',
+          notify: true
+        }
+      },
+      sendMessage: function () {
+        this.$.pub1.go();
+      },
+      connectEvent: function () {
+        if (this.connected) {
+          this.$.a.disconnect();
+        } else {
+          this.$.a.connect();
+        }
+      },
+      _computeStyle: function (connected) {
+        return 'display:' + connected ? 'block' : 'none';
+      },
+      _computeExpression1: function (connected) {
+        return connected ? 'Disconnect' : 'Connect';
+      }
+    });
+  </script>
+</dom-module>
